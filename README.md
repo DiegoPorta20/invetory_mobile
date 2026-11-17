@@ -68,3 +68,13 @@ Cada exportación usa los filtros activos de la pantalla y abre la hoja de compa
 | Productos → ícono Excel → *Exportar lista de precios* | `GET /api/products/price-list/export` |
 | Movimientos → ícono de descarga | `GET /api/stock-movements/export` |
 | Reposición → ícono de descarga | `GET /api/reorder/export` |
+
+## Multiempresa
+
+Un solo APK sirve a todas las empresas. La configuración (nombre, logo, colores, módulos, permisos y límites) la define `../config_inventory`; la app solo la consume.
+
+- El login pide **código de empresa**, correo y contraseña. Al escribir el código se muestra la marca de esa empresa (`GET /api/public/companies/:slug/branding`).
+- Tras iniciar sesión se lee `GET /api/config`: rol, módulos habilitados, permisos y marca. Se guarda en caché para arrancar sin conexión.
+- `core/config/client_config.dart`: `clientConfigProvider`, `canProvider`, `canSeeCostsProvider`, `canSeePricesProvider` y el widget `Can`. Toda pantalla que muestre un botón o dato sensible debe consultarlos.
+- Menú, pestañas y rutas se filtran por módulo (`core/router/module_access.dart`). Sin permiso de costos o precios, la app no muestra esos campos ni los envía al guardar (el API los rechaza).
+- `AppColors` toma sus tonos de `BrandPalette`; cuando cambia la paleta se repinta toda la app. El nombre y el ícono del lanzador de Android no cambian por empresa (es un único APK).
